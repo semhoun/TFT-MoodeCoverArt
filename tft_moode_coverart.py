@@ -223,11 +223,13 @@ def main():
     vol = 0
     oldvol = -1
     volchanged = 0
+    scr_light = False
 
     act_mpd = is_service_active("mpd")
 
     # Standard SPI connections for ST7789
     # Create and initialize ST7789 LCD display class (also turns the backlight on)
+    # mode=3 for display boards without cs pin
     if MODE == 3:
         disp = ST7789.ST7789(
             port=0,
@@ -239,6 +241,7 @@ def main():
             rotation=0,
             spi_speed_hz=80 * 1000 * 1000
         )
+    # mode=0 for pirate audio and display boards with cs pin (default)
     else:
         disp = ST7789.ST7789(
             port=0,
@@ -427,21 +430,26 @@ def main():
                         # NOTE: initialization is unnecesary for ST7789, the class does it when created
                         # Initialize display
                         # disp.set_backlight(True)
+                        # scr_light = True
 
+                        # Debug image
                         # im7 = img.save(script_path + "/dump.jpg")
                         c += 1
 
                     disp.display(img)
 
                     if state:
-                        if state == "stop" and BLANK != 0:
-                            if ss < BLANK:
+                        if state != "play" and BLANK != 0:
+                            if ss < BLANK * 2:  # NOTE that we sleep for 1/2 second now in each loop
                                 ss += 1
-                            else:
+                            elif scr_light == True:
                                 disp.set_backlight(False)
+                                scr_light = False
                         else:
                             ss = 0
-                            disp.set_backlight(True)
+                            if scr_light == False:
+                                disp.set_backlight(True)
+                                scr_light = True
 
                     if state == "play":
                         time.sleep(0.1)
@@ -451,6 +459,7 @@ def main():
                 except KeyboardInterrupt:
                     print("Keyboard interrupt, exiting!", file = sys.stderr)
                     disp.set_backlight(False)
+                    scr_light = False
                     # disp.reset()
                     break
                 except BaseException as e:
