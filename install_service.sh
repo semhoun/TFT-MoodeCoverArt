@@ -5,10 +5,10 @@ cd /home/pi/TFT-MoodeCoverArt
 
 while true
 do
-    read -p "Do you wish to install TFT-MoodeCoverArt as a service?" yn
+    read -p "Do you wish to install TFT-MoodeCoverArt as a service? " yn
     case $yn in
         [Yy]* ) echo -e "Installing Service \n"
-                sudo cp tft-moodecoverart.service /etc/systemd/system
+                sudo cp --preserve=timestamps tft-moodecoverart.service /etc/systemd/system
                 sudo chmod 644 /etc/systemd/system/tft-moodecoverart.service
                 sudo systemctl daemon-reload
                 sudo systemctl enable tft-moodecoverart.service
@@ -22,7 +22,7 @@ done
 
 while true
 do
-    read -p "Do you wish to reboot now?" yn
+    read -p "Do you wish to reboot now? " yn
     case $yn in
         [Yy]* ) echo -e "Rebooting \n"
                 sudo reboot
