@@ -223,7 +223,7 @@ def main():
     vol = 0
     oldvol = -1
     volchanged = 0
-    scr_light = False
+    scr_light = True
 
     act_mpd = is_service_active("mpd")
 
@@ -452,9 +452,11 @@ def main():
                                 scr_light = True
 
                     if state == "play":
-                        time.sleep(0.1)
+                        time.sleep(0.2)
+                    elif ss > 0 and ss > BLANK:
+                        time.sleep(1.5)  # "Deep-sleep" mode
                     else:
-                        time.sleep(0.5)
+                        time.sleep(0.5)  # Stop or pause mode
 
                 except KeyboardInterrupt:
                     print("Keyboard interrupt, exiting!", file = sys.stderr)
