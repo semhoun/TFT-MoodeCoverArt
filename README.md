@@ -1,4 +1,9 @@
 # TFT-MoodeCoverArt 
+*version = "0.0.9" : changes*
+
+- change default logo to color image and png file
+- check wifi connection
+
 *version = "0.0.8" : changes*
 
 * changed the service file installation path, for consistency and to fix the uninstall script which was non-functional
@@ -58,7 +63,7 @@ Metadata displayed:
 
 Overlays with a Time bar, Volume bar and Play/Pause, Next and Volume icons to match the Pirate Audio buttons are optional.
 
-There is also an option in config.yml to not display metadata.
+There is also an option in config.yml to not display metadata
 
 The script has a built in test to see if the mpd service is running. This should allow enough delay when 
 used as a service. If a running mpd service is not found after around 30 seconds the script displays the following and stops.
@@ -77,7 +82,7 @@ For the `Airplay`, `Spotify`, `Bluetooth`, `Squeezelite` and `Dac Input` rendere
 
 The overlay colours adjust for light and dark artwork, but can be hard to read with some artwork.
 
-The script does not search online for artwork.
+The script does not search online for artwork
 
 ### Assumptions.
 
@@ -90,6 +95,7 @@ If your pirate audio board doesn't output anything
 Choose "Pimoroni pHAT DAC" or "HiFiBerry DAC" in moode audio config
 
 See the Installation section [**here**](https://github.com/pimoroni/pirate-audio) about gpio pin 25. 
+
 
 ### Preparation.
 
@@ -106,7 +112,7 @@ sudo pip3 install pyyaml
 ```
 Install the TFT driver.
 
-I have forked the Pimoroni driver and modified it to work with other ST7789 boards. Install it with the following command:
+[rusconi](https://github.com/rusconi) have forked the Pimoroni driver and modified it to work with other ST7789 boards. Install it with the following command:
 
 ```
 sudo pip3 install RPI-ST7789
@@ -117,20 +123,20 @@ sudo pip3 install RPI-ST7789
 Recommended: set "GPIO config" (in Moode System Configuration) with these values:
 * Button 1 (on), PIN 5, CMD: `/home/pi/TFT-MoodeCoverArt/shutdown_or_toggle_play.sh`
 ** If the power-off action is not wanted, use CMD: `mpc,toggle` (play/pause)
-* Button 2 (on), PIN 6, CMD: `/var/www/vol.sh,-dn,1`
+* Button 2 (on), PIN 6, CMD: `/var/www/vol.sh,-dn,5`
 * Button 3 (on), PIN 16, CMD: `mpc,next`
-* Button 4 (on), PIN 24, CMD: `/var/www/vol.sh,-up,1`
+* Button 4 (on), PIN 24, CMD: `/var/www/vol.sh,-up,5`
 
 ### Install the TFT-MoodeCoverArt script
 
 ```
 cd /home/pi
-git clone https://github.com/rusconi/TFT-MoodeCoverArt.git
+git clone https://github.com/semhoun/TFT-MoodeCoverArt.git
 ```
 
 ### Config File
 
-The default config should work with Pirate Audio boards.
+The default config should work with Pirate Audio boards
 
 The config.yml file can be edited to:
 
@@ -138,13 +144,13 @@ The config.yml file can be edited to:
 * set overlay display options
 * display the text with a shadow
 
-The comments in 'config.yml' should be self explanatory.
+The comments in 'config.yml' should be self explanatory
 
 
-**Make the shell scripts executable, if needed:**
+**Make the shell scripts executable:**
 
 ```
-chmod 777 *.sh
+chmod 755 /home/pi/TFT-MoodeCoverArt/*.sh
 ```
 
 Test the script:

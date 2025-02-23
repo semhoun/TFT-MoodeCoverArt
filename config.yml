@@ -1,4 +1,4 @@
-# version = "0.0.8"
+# version = "0.0.9"
 display:
   # Display control overlays:
   # 3=Full overlay displayed: volume icon+bar and play/pause+next icons (default)

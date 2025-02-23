@@ -15,7 +15,7 @@ import yaml
 import urllib.parse
 
 
-__version__ = "0.0.8"
+__version__ = "0.0.9"
 
 # Get the path of the script
 script_path = os.path.dirname(os.path.abspath( __file__ ))
@@ -52,6 +52,7 @@ HEIGHT = 240
 font_s = ImageFont.truetype(script_path + "/fonts/Roboto-Medium.ttf", 20)
 font_m = ImageFont.truetype(script_path + "/fonts/Roboto-Medium.ttf", 24)
 font_l = ImageFont.truetype(script_path + "/fonts/Roboto-Medium.ttf", 28)
+font_xl = ImageFont.truetype(script_path + '/fonts/Roboto-Medium.ttf',38)
 
 img = Image.new("RGB", (WIDTH, HEIGHT), color=(0, 0, 0, 25))
 draw = ImageDraw.Draw(img, "RGBA")
@@ -65,7 +66,7 @@ pause_icons_dark = Image.open(script_path + "/images/controls-pause-dark.png").r
 vol_icons = Image.open(script_path + "/images/controls-vol.png").resize((WIDTH, HEIGHT), resample=Image.LANCZOS).convert("RGBA")
 vol_icons_dark = Image.open(script_path + "/images/controls-vol-dark.png").resize((WIDTH, HEIGHT), resample=Image.LANCZOS).convert("RGBA")
 
-df_back = Image.open(script_path + "/images/default-cover-v6.jpg").resize((WIDTH, HEIGHT), resample=Image.LANCZOS).convert("RGB")
+df_back = Image.open(script_path + "/images/moode.png").resize((WIDTH, HEIGHT), resample=Image.LANCZOS).convert("RGB")
 bt_back = Image.open(script_path + "/images/bta.png").resize((WIDTH, HEIGHT), resample=Image.LANCZOS).convert("RGB")
 ap_back = Image.open(script_path + "/images/airplay.png").resize((WIDTH, HEIGHT), resample=Image.LANCZOS).convert("RGB")
 sp_back = Image.open(script_path + "/images/spotify.png").resize((WIDTH, HEIGHT), resample=Image.LANCZOS).convert("RGB")
@@ -201,6 +202,53 @@ def get_cover(metaDict):
     resultgauss = result.filter(ImageFilter.GaussianBlur).convert("RGB")
     return result, resultgauss, coverok
 
+def checkWIFI(disp):
+
+    waiting = True
+    count = 0
+    spinner_chars="/-\|"
+
+    while (waiting == True):
+
+        if count < 90:
+            draw.rectangle((0,0,240,240), fill=(0,0,0))
+            txt = ' Looking for\nWIFI...\n' + spinner_chars[(count % 4)]
+            left, top, right, bottom = draw.multiline_textbbox((0, 0),txt, font=font_xl, spacing=4)
+            mlw = right - left
+            draw.multiline_text(((WIDTH-mlw)//2, 20), txt, fill=(255,255,255), font=font_xl, spacing=4, align="center")
+            disp.display(img)
+            
+            
+            scanoutput = subprocess.check_output(["iwgetid"])
+            txt = 'Not connected\nWaiting...'
+            for line in scanoutput.split():
+              line = line.decode("utf-8")
+              if line[:5]  == "ESSID":
+                ssid = line.split('"')[1]
+                txt = 'Connected!\nNetwork name:\n' + ssid
+                waiting = False
+                
+            left, top, right, bottom = draw.multiline_textbbox((0, 0),txt, font=font_l, spacing=4)
+            mlw, mlh = right - left, bottom - top
+            draw.multiline_text(((WIDTH-mlw)//2, 140), txt, fill=(255,255,255), font=font_l, spacing=4, align="center")
+            disp.display(img)
+                
+        else:
+            draw.rectangle((0,0,240,240), fill=(0,0,0))
+            txt = 'No network found!\n\nConnect to\nWIFI: "radio-setup"\npassw: "radio.local"\nand browse to\nhttp://radio.local' 
+            left, top, right, bottom = draw.multiline_textbbox((0, 0),txt, font=font_m, spacing=4)
+            mlw, mlh = right - left, bottom - top
+            draw.multiline_text((0,0), txt, fill=(255,255,255), font=font_m, spacing=4, align="left")
+            disp.display(img) 
+
+        count += 1
+
+        if (waiting):
+            time.sleep(1)
+        else:
+            time.sleep(5)
+
+    return
 
 def main():
 
@@ -225,8 +273,6 @@ def main():
     volchanged = 0
     scr_light = True
 
-    act_mpd = is_service_active("mpd")
-
     # Standard SPI connections for ST7789
     # Create and initialize ST7789 LCD display class (also turns the backlight on)
     # mode=3 for display boards without cs pin
@@ -250,6 +296,11 @@ def main():
             backlight=13,
             spi_speed_hz=80 * 1000 * 1000
         )
+
+    act_mpd = is_service_active("mpd")
+
+    # booting message (before looking for MPD)
+    checkWIFI(disp)
 
     # FIXME: this prevents MPD from detecting buttons state, so we cannot use it
     # GPIO.setmode(GPIO.BCM)
